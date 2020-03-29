@@ -1,0 +1,13 @@
+name: Syncount
+author: Xenophilicy
+version: 1.0.0
+description: Synchronizes player counts across your server network
+main: Xenophilicy\Syncount\Syncount
+api: 3.0.0
+permissions:
+  syncount:
+    children:
+      syncount.add:
+        default: op
+      syncount.del:
+        default: op
