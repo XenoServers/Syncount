@@ -13,10 +13,18 @@
 #                                         $$/                                        $$$$$$/
 VERSION: "1.0.0" # Internal use only
 
-# This determines how often to check the servers for player count
-# This number is in ticks
-# 20 ticks = 1 second
-Query-Interval: 100
+Query:
+  # This determines how often to check the servers for player count
+  # This number is in ticks
+  # 20 ticks = 1 second
+  Interval: 100
+
+  # This setting is to control the timeout of the server query task
+  # DO NOT edit this value if you don't know the consequences of changing its value
+  # This value is in seconds
+  # Raising this value can allow more time to query your server but may result in longer strain on the server
+  # Lowering this value will reduce strain but will significantly decrease the amount of time allowed for queries
+  Timeout: 1
 
 # This is where servers are listed
 # Format servers as hostname:port
