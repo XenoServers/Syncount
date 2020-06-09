@@ -41,7 +41,10 @@ class QueryTaskCaller extends Task {
     }
     
     /**
+     * Actions to execute when run
+     *
      * @param int $currentTick
+     * @return void
      */
     public function onRun(int $currentTick){
         $this->plugin->getServer()->getAsyncPool()->submitTask(new QueryTask($this->host, $this->port));

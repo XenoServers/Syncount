@@ -28,7 +28,6 @@ class QueryTask extends AsyncTask {
     private $host;
     private $port;
     private $pluginList;
-    private $timeout;
     
     /**
      * QueryTask constructor.
@@ -39,19 +38,31 @@ class QueryTask extends AsyncTask {
         $this->host = $host;
         $this->port = $port;
         $this->pluginList = "";
-        $this->timeout = Syncount::$settings["Query"]["Timeout"];
     }
     
     public function onRun(){
-        $queryServer = $this->sendQuery($this->host, $this->port);
+        $queryServer = $this->sendQuery($this->host, (int)$this->port);
         $status = $queryServer === null ? 'offline' : 'online';
-        if($status == "online" && count($queryServer) >= 16){
+        if($status == "online"){
             $this->pluginList = $queryServer[11];
             $this->setResult([$queryServer[15], $queryServer[17]]);
         }else{
             $this->setResult([0, 0]);
         }
+        
     }
+    
+    /**
+     * @param Server $server
+     * @return void
+     */
+    public function onCompletion(Server $server){
+        if(!Syncount::getPlugin()->isDisabled()){
+            Syncount::getPlugin()->queryTaskCallback($this->getResult(), $this->host, $this->port, $this->pluginList);
+        }
+    }
+    
+    // This is an edited GitHub Gist by xBeastMode → https://gist.github.com/xBeastMode/89a9d85c21ec5f42f14db49550ea8e5c
     
     /**
      * @param string $host
@@ -59,9 +70,10 @@ class QueryTask extends AsyncTask {
      * @return false|string[]|null
      */
     private function sendQuery(string $host, int $port){
-        $socket = @fsockopen("udp://" . $host, $port);
+        $timeout = 1;
+        $socket = @fsockopen("udp://" . $host, $port, $timeout);
         if(!$socket) return null;
-        stream_set_timeout($socket, (int)$this->timeout);
+        stream_set_timeout($socket, 1);
         $online = @fwrite($socket, "\xFE\xFD\x09\x10\x20\x30\x40\xFF\xFF\xFF\x01");
         if(!$online) return null;
         $challenge = @fread($socket, 1400);
@@ -80,16 +92,5 @@ class QueryTask extends AsyncTask {
         array_pop($response);
         @fclose($socket);
         return $response;
-    }
-    
-    // This is an edited GitHub Gist by xBeastMode → https://gist.github.com/xBeastMode/89a9d85c21ec5f42f14db49550ea8e5c
-    
-    /**
-     * @param Server $server
-     */
-    public function onCompletion(Server $server){
-        if(!Syncount::getPlugin()->isDisabled()){
-            Syncount::getPlugin()->queryTaskCallback($this->getResult(), $this->host, $this->port, $this->pluginList);
-        }
     }
 }

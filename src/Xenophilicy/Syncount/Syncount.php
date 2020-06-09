@@ -29,28 +29,16 @@ use Xenophilicy\Syncount\Task\QueryTaskCaller;
 class Syncount extends PluginBase implements Listener {
     
     public static $plugin;
-    public static $settings;
-    public $config;
-    /**
-     * @var array
-     */
-    public $queryResults;
-    /**
-     * @var bool|mixed
-     */
+    private $queryResults;
     private $interval;
-    
-    public static function getPlugin(): Syncount{
-        return self::$plugin;
-    }
     
     public function onEnable(){
         self::$plugin = $this;
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $this->saveDefaultConfig();
         $this->config = new Config($this->getDataFolder() . "config.yml", Config::YAML);
-        self::$settings = $this->config->getAll();
-        $this->interval = self::$settings["Query"]["Interval"];
+        $this->config->getAll();
+        $this->interval = $this->config->get("Query-Interval");
         if(!is_numeric($this->interval)){
             $this->getLogger()->critical("Invalid query interval found, it must be an integer! Plugin will remain disabled...");
             $this->getServer()->getPluginManager()->disablePlugin($this);
@@ -66,8 +54,8 @@ class Syncount extends PluginBase implements Listener {
         $this->getServer()->getCommandMap()->register("syncount", new SyncountCommand("syncount", $this));
     }
     
-    public function startQueryTask(string $host, int $port): void{
-        $this->getScheduler()->scheduleTask(new QueryTaskCaller($this, $host, $port));
+    public static function getPlugin(): Syncount{
+        return self::$plugin;
     }
     
     public function onQueryRegenerate(QueryRegenerateEvent $event): void{
@@ -87,7 +75,7 @@ class Syncount extends PluginBase implements Listener {
      * @param int $port
      * @param string $plugins
      */
-    public function queryTaskCallback($result, string $host = "", int $port = 0, string $plugins = ""): void{
+    public function queryTaskCallback($result, string $host, int $port, string $plugins = ""): void{
         if($plugins !== ""){
             if(preg_match("/Syncount/", $plugins)){
                 $this->getLogger()->critical("Server " . $host . ":" . $port . " has Syncount installed! To avoid infinite player counts, install the plugin on only one server!");
@@ -98,5 +86,9 @@ class Syncount extends PluginBase implements Listener {
         }
         $this->getScheduler()->scheduleDelayedTask(new QueryTaskCaller($this, $host, $port), $this->interval);
         $this->queryResults[$host . ":" . $port] = $result;
+    }
+    
+    public function startQueryTask(string $host, int $port): void{
+        $this->getScheduler()->scheduleTask(new QueryTaskCaller($this, $host, $port));
     }
 }
