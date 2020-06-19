@@ -19,8 +19,21 @@ use pocketmine\command\{CommandSender, PluginCommand};
 use pocketmine\utils\TextFormat as TF;
 use Xenophilicy\Syncount\Syncount;
 
+/**
+ * Class SyncountCommand
+ * @package Xenophilicy\Syncount\Command
+ */
 class SyncountCommand extends PluginCommand {
     
+    /**
+     * @var Syncount
+     */
+    private $plugin;
+    
+    /**
+     * @param string $name
+     * @param Syncount $plugin
+     */
     public function __construct(string $name, Syncount $plugin){
         parent::__construct($name, $plugin);
         $this->plugin = $plugin;

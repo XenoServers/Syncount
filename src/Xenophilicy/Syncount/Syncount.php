@@ -29,8 +29,13 @@ use Xenophilicy\Syncount\Task\QueryTaskCaller;
 class Syncount extends PluginBase implements Listener {
     
     public static $plugin;
-    private $queryResults;
+    public $queryResults;
+    public $config;
     private $interval;
+    
+    public static function getPlugin(): Syncount{
+        return self::$plugin;
+    }
     
     public function onEnable(){
         self::$plugin = $this;
@@ -42,6 +47,7 @@ class Syncount extends PluginBase implements Listener {
         if(!is_numeric($this->interval)){
             $this->getLogger()->critical("Invalid query interval found, it must be an integer! Plugin will remain disabled...");
             $this->getServer()->getPluginManager()->disablePlugin($this);
+            return;
         }
         $this->queryResults = [];
         foreach($this->config->get("Servers") as $server){
@@ -54,8 +60,8 @@ class Syncount extends PluginBase implements Listener {
         $this->getServer()->getCommandMap()->register("syncount", new SyncountCommand("syncount", $this));
     }
     
-    public static function getPlugin(): Syncount{
-        return self::$plugin;
+    public function startQueryTask(string $host, int $port): void{
+        $this->getScheduler()->scheduleTask(new QueryTaskCaller($this, $host, $port));
     }
     
     public function onQueryRegenerate(QueryRegenerateEvent $event): void{
@@ -86,9 +92,5 @@ class Syncount extends PluginBase implements Listener {
         }
         $this->getScheduler()->scheduleDelayedTask(new QueryTaskCaller($this, $host, $port), $this->interval);
         $this->queryResults[$host . ":" . $port] = $result;
-    }
-    
-    public function startQueryTask(string $host, int $port): void{
-        $this->getScheduler()->scheduleTask(new QueryTaskCaller($this, $host, $port));
     }
 }

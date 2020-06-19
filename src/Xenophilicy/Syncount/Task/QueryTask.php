@@ -53,18 +53,6 @@ class QueryTask extends AsyncTask {
     }
     
     /**
-     * @param Server $server
-     * @return void
-     */
-    public function onCompletion(Server $server){
-        if(!Syncount::getPlugin()->isDisabled()){
-            Syncount::getPlugin()->queryTaskCallback($this->getResult(), $this->host, $this->port, $this->pluginList);
-        }
-    }
-    
-    // This is an edited GitHub Gist by xBeastMode → https://gist.github.com/xBeastMode/89a9d85c21ec5f42f14db49550ea8e5c
-    
-    /**
      * @param string $host
      * @param int $port
      * @return false|string[]|null
@@ -92,5 +80,17 @@ class QueryTask extends AsyncTask {
         array_pop($response);
         @fclose($socket);
         return $response;
+    }
+    
+    // This is an edited GitHub Gist by xBeastMode → https://gist.github.com/xBeastMode/89a9d85c21ec5f42f14db49550ea8e5c
+    
+    /**
+     * @param Server $server
+     * @return void
+     */
+    public function onCompletion(Server $server){
+        if(!Syncount::getPlugin()->isDisabled()){
+            Syncount::getPlugin()->queryTaskCallback($this->getResult(), $this->host, $this->port, $this->pluginList);
+        }
     }
 }
