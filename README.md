@@ -1,5 +1,4 @@
 # Syncount
-[![](https://poggit.pmmp.io/shield.state/Syncount)](https://poggit.pmmp.io/p/Syncount)
 [![HitCount](http://hits.dwyl.io/Xenophilicy/Syncount.svg)](http://hits.dwyl.io/Xenophilicy/Syncount)
 [![Discord Chat](https://img.shields.io/discord/490677165289897995.svg)](https://discord.gg/hNVehXe)
 
@@ -16,7 +15,6 @@ If no port is supplied, the default port (19132) will be used in its place
 
 ## Syncount Details
 * **API:** 3.0.0+
-* **Version:** 1.0.0
 * **Basic Description:** Synchronizes player counts across your server network
 * *Easy-to-edit config.yml file*
 * *Simple code for editing and debugging*

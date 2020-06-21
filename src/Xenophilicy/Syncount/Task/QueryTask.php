@@ -43,8 +43,7 @@ class QueryTask extends AsyncTask {
     public function onRun(){
         $queryServer = $this->sendQuery($this->host, (int)$this->port);
         $status = $queryServer === null ? 'offline' : 'online';
-        if($status == "online"){
-            $this->pluginList = $queryServer[11];
+        if($status == "online" && count($queryServer) >= 16){
             $this->setResult([$queryServer[15], $queryServer[17]]);
         }else{
             $this->setResult([0, 0]);

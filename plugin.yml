@@ -1,6 +1,6 @@
 name: Syncount
 author: Xenophilicy
-version: 1.0.0
+version: 1.0.1
 description: Synchronizes player counts across your server network
 main: Xenophilicy\Syncount\Syncount
 api: 3.0.0
