@@ -42,7 +42,6 @@ class QueryTaskCaller extends Task {
     
     /**
      * Actions to execute when run
-     *
      * @param int $currentTick
      * @return void
      */

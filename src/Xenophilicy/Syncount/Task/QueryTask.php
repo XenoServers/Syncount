@@ -42,14 +42,14 @@ class QueryTask extends AsyncTask {
     
     public function onRun(){
         $queryServer = $this->sendQuery($this->host, (int)$this->port);
-        $status = $queryServer === null ? 'offline' : 'online';
-        if($status == "online" && count($queryServer) >= 16){
-            $this->setResult([$queryServer[15], $queryServer[17]]);
+        if(isset($queryServer["numplayers"]) && isset($queryServer["maxplayers"])){
+            $this->setResult([$queryServer["numplayers"], $queryServer["maxplayers"]]);
         }else{
             $this->setResult([0, 0]);
         }
-        
     }
+    
+    // This is an edited GitHub Gist by xBeastMode → https://gist.github.com/xBeastMode/89a9d85c21ec5f42f14db49550ea8e5c
     
     /**
      * @param string $host
@@ -70,18 +70,16 @@ class QueryTask extends AsyncTask {
         $challenge = substr(preg_replace("/[^0-9-]/si", "", $challenge), 1);
         $query = sprintf("\xFE\xFD\x00\x10\x20\x30\x40%c%c%c%c\xFF\xFF\xFF\x01", $challenge >> 24, $challenge >> 16, $challenge >> 8, $challenge >> 0);
         if(!@fwrite($socket, $query)) return null;
-        $response = [];
-        $response[] = @fread($socket, 2048);
-        $response = implode($response);
-        $response = substr($response, 16);
-        $response = explode("\0", $response);
-        array_pop($response);
-        array_pop($response);
+        $response = explode("\0", @fread($socket, 2048));
+        $result = [];
+        foreach($response as $value){
+            $index = array_search($value, $response);
+            if($index % 2 === 0) continue;
+            $result[$value] = $response[$index + 1];
+        }
         @fclose($socket);
-        return $response;
+        return $result;
     }
-    
-    // This is an edited GitHub Gist by xBeastMode → https://gist.github.com/xBeastMode/89a9d85c21ec5f42f14db49550ea8e5c
     
     /**
      * @param Server $server

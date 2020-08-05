@@ -58,10 +58,10 @@ class SyncountCommand extends PluginCommand {
                     }
                     $this->plugin->queryResults[$args[1] . ":" . $port] = [0, 0];
                     $this->plugin->startQueryTask($args[1], $port);
-                    $servers = $this->plugin->config->get("Servers");
+                    $servers = $this->plugin->getConfig()->get("Servers");
                     array_push($servers, $args[1] . ":" . $port);
-                    $this->plugin->config->set("Servers", $servers);
-                    $this->plugin->config->save();
+                    $this->plugin->getConfig()->set("Servers", $servers);
+                    $this->plugin->getConfig()->save();
                     $sender->sendMessage(TF::GREEN . "Server " . TF::AQUA . $args[1] . ":" . $port . TF::GREEN . " has been added");
                     break;
                 case "rm":
@@ -74,10 +74,10 @@ class SyncountCommand extends PluginCommand {
                         return true;
                     }
                     unset($this->plugin->queryResults[$args[1] . ":" . $args[2]]);
-                    $servers = $this->plugin->config->get("Servers");
+                    $servers = $this->plugin->getConfig()->get("Servers");
                     unset($servers[$args[1] . ":" . $port]);
-                    $this->plugin->config->set("Servers", $servers);
-                    $this->plugin->config->save();
+                    $this->plugin->getConfig()->set("Servers", $servers);
+                    $this->plugin->getConfig()->save();
                     $sender->sendMessage(TF::GREEN . "Server " . TF::AQUA . $args[1] . ":" . $port . TF::GREEN . " has been removed");
                     break;
                 default:

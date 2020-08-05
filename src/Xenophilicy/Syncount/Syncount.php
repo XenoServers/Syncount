@@ -18,7 +18,6 @@ namespace Xenophilicy\Syncount;
 use pocketmine\event\Listener;
 use pocketmine\event\server\QueryRegenerateEvent;
 use pocketmine\plugin\PluginBase;
-use pocketmine\utils\Config;
 use Xenophilicy\Syncount\Command\SyncountCommand;
 use Xenophilicy\Syncount\Task\QueryTaskCaller;
 
@@ -30,7 +29,6 @@ class Syncount extends PluginBase implements Listener {
     
     public static $plugin;
     public $queryResults;
-    public $config;
     private $interval;
     
     public static function getPlugin(): Syncount{
@@ -41,16 +39,14 @@ class Syncount extends PluginBase implements Listener {
         self::$plugin = $this;
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $this->saveDefaultConfig();
-        $this->config = new Config($this->getDataFolder() . "config.yml", Config::YAML);
-        $this->config->getAll();
-        $this->interval = $this->config->get("Query-Interval");
+        $this->interval = $this->getConfig()->get("Query-Interval");
         if(!is_numeric($this->interval)){
             $this->getLogger()->critical("Invalid query interval found, it must be an integer! Plugin will remain disabled...");
             $this->getServer()->getPluginManager()->disablePlugin($this);
             return;
         }
         $this->queryResults = [];
-        foreach($this->config->get("Servers") as $server){
+        foreach($this->getConfig()->get("Servers") as $server){
             $values = explode(":", $server);
             $host = $values[0];
             $port = $values[1];
@@ -61,7 +57,7 @@ class Syncount extends PluginBase implements Listener {
     }
     
     public function startQueryTask(string $host, int $port): void{
-        $this->getScheduler()->scheduleTask(new QueryTaskCaller($this, $host, $port));
+        $this->getScheduler()->scheduleRepeatingTask(new QueryTaskCaller($this, $host, $port), $this->interval);
     }
     
     public function onQueryRegenerate(QueryRegenerateEvent $event): void{
@@ -90,7 +86,6 @@ class Syncount extends PluginBase implements Listener {
                 return;
             }
         }
-        $this->getScheduler()->scheduleDelayedTask(new QueryTaskCaller($this, $host, $port), $this->interval);
         $this->queryResults[$host . ":" . $port] = $result;
     }
 }
